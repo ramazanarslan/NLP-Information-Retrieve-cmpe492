@@ -1,2 +1,1 @@
-# cmpe492
-Univercity Project for graduation
+# Cmpe 492 - Project
