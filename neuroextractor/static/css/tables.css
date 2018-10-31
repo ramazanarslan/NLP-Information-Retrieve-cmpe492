@@ -1,0 +1,30 @@
+.table-customize1 {
+    border-collapse: separate;
+    border: 6px solid black;
+    -webkit-border-radius: 10px;
+    width: 60%;
+    margin-top: 60px
+    /* height:50px */
+    /* text-align:center */
+    /* vertical-align:center */
+
+}
+.table-customize1 tr:hover {background-color: #f5f5f5}
+
+.th-customize1{
+    background-color: #157A19;
+    color: white;
+    text-align: center;
+    position: relative;
+}
+
+.td-customize1{
+    background-color: #1B5F75 ;
+    color: white;
+    position: relative;
+}
+
+.no-padding{
+    padding: 0 !important;
+    margin: 0 !important;
+}

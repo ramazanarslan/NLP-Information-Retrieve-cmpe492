@@ -1,0 +1,29 @@
+.btn-circle {
+  width: 20px;
+  height: 20px;
+  text-align: center;
+  padding: 2px 0;
+  font-size: 10px;
+  line-height: 1.428571429;
+  border-radius: 10px;
+}
+
+.form-control{
+        -webkit-appearance:none;
+        -moz-appearance: none;
+        -ms-appearance: none;
+        -o-appearance: none;
+        appearance: none;
+}
+
+input {
+  resize: vertical;
+}
+
+input:active {
+  height: auto;
+}
+
+.hide-abstract-sentences {
+  display: none;
+}

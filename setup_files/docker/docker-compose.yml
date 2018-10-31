@@ -1,0 +1,18 @@
+version: '2'
+
+services:
+    neuroboun_python_c:
+        container_name: neuroboun_python_c
+        image: neuroboun_python
+        ports: 
+            - 8000:8000
+
+    neuroboun_postgres_c:
+        container_name: neuroboun_postgres_c
+        image: neuroboun_postgres
+        volumes:
+            - neuroboun_postgresql-volume:/var/lib/postgresql/9.5/main
+
+volumes:
+    neuroboun_postgresql-volume:
+        external: true

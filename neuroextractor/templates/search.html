@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<script type="text/javascript" src="/static/search.js"></script>
+
+
+    <div class="row ">
+        <div class="col-md-4 col-md-offset-4 text-center">
+            <h1>NeuroBoun</h1>
+        </div>
+    </div>
+
+
+    <form class="form-inline text-center" action="/results" method="get">
+        <div id="perpective-1" class="perspective-class" style="display: inline">
+
+            <div class="row" style="padding-top: 20px">
+                <div class="col-md-4 col-md-offset-4">
+                  <select name="fields" class="form-control">
+                      <option value="allfields">All Fields</option>
+                      <option value="title">Title</option>
+                      <option value="abstract">Abstract</option>
+                  </select>
+                  <input type="text" name="query" class="form-control" placeholder="Search for ...">
+                  <button class="btn btn-default btn-success" type="submit">Go!</button>
+                  <br>
+                  <br>
+                  <input id="toggle_yearFilter" type="checkbox" data-toggle="toggle">
+                  <div class="input-group">
+                    <span class="input-group-addon">After</span>
+                    <input type="number" pattern="^[1-9]\d*$" min="1"  step="1" id="startYear" name="sYear" disabled class="form-control" style="width: 80px" placeholder="year" />
+                    <span class="input-group-addon" style="border-left: 0; border-right: 0;">Before</span>
+                    <input type="number" pattern="^[1-9]\d*$" min="1"  step="1" id="endYear" name="eYear" disabled class="form-control" style="width: 80px" placeholder="year" />
+                  </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <form class="form-inline " action="/tables" method="get">
+        <div id="perpective-2" class="perspective-class"  style="display: none">
+
+            <div class="row" style="padding-top: 20px">
+                <div class="col-md-6 col-md-offset-3">
+                  <div id="constraints" class=" text-center">
+                    <table class="table">
+                      <tr style="font-weight:bold;">
+                        <td>Preceding</td>
+                        <td>Main</td>
+                        <td>Succeeding</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <input type="text"  style="margin-right:10px;" name="preceding" class="form-control" placeholder="Write preceding word list">
+                        </td>
+                        <td>
+                          <input type="text" style="margin-right:10px;" name="main" class="form-control" placeholder="Base query term list">
+                        </td>
+                        <td>
+                          <input type="text"  name="succeeding" class="form-control" placeholder="Write succeeding word list">
+                        </td>
+                      </tr>
+                    </table>
+                    <br>
+
+                    <div class="row">
+                      <div class="col-md-4 col-md-offset-4">
+                        <b>Predefined identifiers:</b>&nbsp;
+                        <table class="table">
+                          <tr>
+                            <td>
+                              <input id="gender_box" type="checkbox" class="checkbox-inline">
+                            </td>
+                            <td>
+                              Gender
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>
+                              <input id="asym_box" type="checkbox" class="checkbox-inline">
+                            </td>
+                            <td>
+                              Asymmetry
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>
+                              <input id="human_box" type="checkbox" class="checkbox-inline">
+                            </td>
+                            <td>
+                              Human-Nonhuman
+                            </td>
+                          </tr>
+                        </table>
+
+                      </div>
+                    </div>
+
+                    <br>
+                    <div class="" style="margin-left: 10px; margin-top:10px;">
+                        <b>Constraints</b>
+                        <br>
+                        <button id="addConstraint" style=" margin-top:10px;" class="btn btn-default btn-info"  type="button" > Add Constraint</button>
+                    </div>
+                  </div>
+                </div>
+            </div>
+
+            <div class="row text-center" style="padding-top: 20px">
+                <div class="col-md-6 col-md-offset-3">
+
+                    <input id="toggleYearFilter" type="checkbox" data-toggle="toggle">
+
+                    <div class="input-group">
+                      <span class="input-group-addon">After</span>
+                      <input type="number" pattern="^[1-9]\d*$" min="1"  step="1" id="yearStart" name="yearStart" disabled class="form-control" style="width: 80px" placeholder="year" />
+                      <span class="input-group-addon" style="border-left: 0; border-right: 0;">Before</span>
+                      <input type="number" pattern="^[1-9]\d*$" min="1"  step="1" id="yearEnd" name="yearEnd" disabled class="form-control" style="width: 80px" placeholder="year" />
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="row text-center" style="padding-top: 20px">
+                <div class="col-md-6 col-md-offset-3">
+                  <div class="form-inline">
+                    <select name="fields" class="form-control">
+                        <option value="allfields">All Fields</option>
+                        <option value="title">Title</option>
+                        <option value="abstract">Abstract</option>
+                    </select>
+                    <button class="btn btn-default btn-success" type="submit">Go!</button>
+                  </div>
+                </div>
+            </div>
+
+        </div>
+
+    </form>
+
+{% endblock content %}

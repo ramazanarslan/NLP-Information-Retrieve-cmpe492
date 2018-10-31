@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load poll_extras %}
+{% load static %}
+{% block content %}
+<link  rel="stylesheet" href="/static/css/tables.css"/>
+<script type="text/javascript" src="/static/tables.js"></script>
+
+    {% for k in range_table_size %}
+
+        <div class="row" style="padding-top: 20px;margin-bottom: -40px;">
+          <div class="col-md-4 col-md-offset-4 text-center">
+            <h2>Results for <b>{% autoescape off %}{% tabletitle tablerequest|safe k %} {% endautoescape %}</b> </h2>
+          </div>
+        </div>
+        <table class="table table-bordered text-center table-customize1 sortable" align="center" data-tableno="{{ k }}">
+            <col width="20%">
+            {% for j2 in range_table_column %}
+                <col width="{% divide_x_by_y 80 capacity_of_row %}%">
+            {% endfor %}
+            <tr>
+                <th class="no-padding" style="height: 100%; position: relative">
+                    <button data-function="export" class="btn btn-default btn-primary" data-tableno="{{ k }}" onclick="exportTable({{ k }},'{{ tablerequest|safe }}');" style="position: absolute;left:0px;bottom:0px;top:0px;width: 50%" type="button">Export</button>
+                    <button data-function="reset" class="btn btn-default btn-warning" data-tableno="{{ k }}" data-rowList="" data-colList="" style="position: absolute;right: 0px;bottom:0px;top:0px; width: 50%" type="button">Reset</button>
+                </th>
+                {% for i2 in range_table_column %}
+                    <th class="th-customize1" style="height: 100%; position: relative" data-colno="{{ i2 }}" data-tableno="{{ k }}" data-relatedCols="{% relatedList col_names i2 %}">
+                        <div class="btn-group" data-toggle="buttons" style="position: absolute;left:0px;bottom:0px;top:0px;width:40px">
+                            <label class="btn btn-success columnPercentageCheckbox" data-colno="{{ i2 }}" data-tableno="{{ k }}">
+                                <input type="checkbox" autocomplete="off">
+                                <span class="glyphicon glyphicon-ok" style="opacity: 0"></span>
+                            </label>
+                        </div>
+                        <div style="padding-left: 25%">
+                            {% lookup col_names 0 i2 k 0 capacity_of_row %}
+                        </div>
+
+                    </th>
+                {% endfor %}
+            </tr>
+
+            {% for j in range_table_row %}
+                <tr class="tr-customize1" data-index="{{ j }}" data-tableno="{{ k }}" data-relatedRows="{% relatedList row_names j %}">
+                    <td class="td-customize1">
+                        <div class="btn-group" data-toggle="buttons" style="float:left; margin-left:-5px; margin-top:-5px; margin-bottom:-5px;">
+                            <label class="btn btn-info rowPercentageCheckbox" data-rowno="{{ j }}" data-tableno="{{ k }}">
+                                <input type="checkbox" autocomplete="off">
+                                <span class="glyphicon glyphicon-ok" style="opacity: 0"></span>
+                            </label>
+                        </div>
+
+                        {% lookup row_names 0 j 0 0 0 %}
+                        {% if j == 0 %}
+                            -
+                        {% endif %}
+
+
+                    </td>
+                    {% for i in range_table_column %}
+                        <td data-celltableno="{{ k }}" data-cellrowno="{{ j }}" data-cellcolno="{{ i }}" sorttable_customkey="{% lookup query_results i j k capacity_of_column capacity_of_table %}"><a href="{% tableCellLink row_names col_names i j k capacity_of_row capacity_of_table nonqueryFilters %}" style="position:relative; display:block;color: black;text-decoration: none">
+                            {% lookup query_results i j k capacity_of_column capacity_of_table %}
+                            <span data-celltableno="{{ k }}" data-cellrowno="{{ j }}" data-cellcolno="{{ i }}" style="position: absolute;right: 0;font-size: 10px"></span>
+                        </a></td>
+
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+    {% endfor %}
+
+{% endblock content %}

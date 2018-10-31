@@ -1,0 +1,72 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>NeuroBoun</title>
+
+    <script type="text/javascript" src="/static/vendor/jquery/jquery-3.1.1.min.js"></script>
+
+    <script type="text/javascript" src="/static/vendor/bootstrap-3.3.7-dist/js/bootstrap.js"></script>
+    <link rel="stylesheet" href="/static/vendor/bootstrap-3.3.7-dist/css/bootstrap.css"/>
+    <link  rel="stylesheet" href="/static/vendor/bootstrap-3.3.7-dist/css/bootstrap-theme.css"/>
+
+    <link href="/static/vendor/bootstrap-toggle-master/css/bootstrap-toggle.min.css" rel="stylesheet"/>
+    <script src="/static/vendor/bootstrap-toggle-master/js/bootstrap-toggle.min.js"></script>
+
+    <script type="text/javascript" src="/static/vendor/sorttable.js"></script>
+
+
+    <link  rel="stylesheet" href="/static/css/main.css"/>
+
+
+    <script type="text/javascript" src="/static/pagination.js"></script>
+  </head>
+  <body>
+    <div class="container-fluid">
+      <nav class="navbar navbar-inverse" style="margin-left:-15px; margin-right:-15px;">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a  style="color:#ffffff; font-weight:bold;" class="navbar-brand" href="/">NeuroBoun</a>
+        </div>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1" >
+          <ul class="nav navbar-nav navbarlist">
+            {% if user.is_authenticated %}
+            <li><a style="color:#ffffff; " href="/">Basic Search</a></li>
+            <li><a style="color:#ffffff; " href="/?perspective=tables">Comparative Search</a></li>
+            {% endif %}
+          </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+              {% if user.is_authenticated %}
+                <li class="dropdown">
+                  <button class="btn btn-info dropdown-toggle" style="margin-top:7px; margin-right:7px;" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    {{user.username}}
+                    <span class="caret"></span>
+                  </button>
+                  <ul style="z-index:1001;" class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                    <li><a href="/accounts/password/change">Change Password</a></li>
+                    <li><a href="/accounts/logout/">Logout</a></li>
+                  </ul>
+                </li>
+              {% else %}
+
+
+              {% endif %}
+            </ul>
+
+
+    </nav><!-- /.navbar-collapse -->
+      {% block content %}
+
+      {% endblock %}
+    </div>
+  </body>
+</html>

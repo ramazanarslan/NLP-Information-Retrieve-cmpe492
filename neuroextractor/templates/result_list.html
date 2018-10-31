@@ -1,0 +1,291 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+{% load humanize %}
+<script type="text/javascript" src="/static/result_list.js"></script>
+<script type="text/javascript">
+
+  var filter_list = "{{filters|safe}}";
+  var level_counts = "{{stats.level_counts|safe}}";
+  var level_percents = "{{stats.level_percents|safe}}";
+  console.log(level_counts);
+  console.log(level_percents);
+</script>
+
+<!--  search area end -->
+<script type="text/javascript" src="/static/vendor/Chart.bundle.min.js"></script>
+<div class="row" style="padding-top: 20px;">
+  <div class="col-md-4 col-md-offset-4 text-center" style = "margin-top:20px;">
+    <h1>Results for <b id="search_header"></b> </h1>
+  </div>
+</div>
+
+{% if "title_count" in stats.general_stats %}
+
+  <div class="row" style="padding-top: 20px;">
+    <div class="col-md-3 text-center" style = "margin-top:20px;">
+      <p >Filters</p>
+      <table class="table table-striped">
+        <tr>
+          <td>Query</td>
+          <td></td>
+          <td>Article Count</td>
+          <td>Restriction % </td>
+        </tr>
+        {% for thefilter , count , percent in stats.levels %}
+        <tr class="mouseover_class">
+          <td ><input type="text" class="form-control filter-update filter-input" value="{{thefilter}}" autocomplete=off style="width:auto; resize:vertical; padding-right:1%; " />
+          </td>
+          <td>
+            <button type="button" class="remove_filter btn btn-warning btn-circle" style="opacity:0.0; margin-left:-400%; margin-top:7px;"><i class="glyphicon glyphicon-remove"></i></button>
+          </td>
+          <td>{{count|intcomma}}</td>
+          <td>{{percent}}</td>
+        </tr>
+        <tr class="or-row" >
+          <td style="line-height:50%; border-top:none !important;">AND</td>
+        </tr>
+        {% endfor %}
+        <tr style="background-color:transparent !important;" >
+          <td> <button id="newquery_button" class="btn btn-info form-control" type="button"> Add New Query</button></td>
+        </tr>
+      </table>
+      <div class="form-inline years-input" >
+        <label for="start-year"  style="float:left;"><b>Years:</b></label>
+        <input pattern="\d{4}" maxlength="4" size="4" id="start_year" autocomplete=off placeholder="Start" class="form-control filter-update " value="{{sYear}}" autocomplete=off/>
+        -
+        <input pattern="\d" maxlength="4" size="4" id="end_year" autocomplete=off placeholder="End" class="form-control filter-update " value="{{eYear}}" autocomplete=off/>
+      </div>
+      <br>
+      <div class="form-inline">
+        <label for="fields" style="float:left;">Fields:</label>
+          <select id="fields" name="fields" style="float:center;" class="form-control">
+            <option value="allfields">All Fields</option>
+            <option value="title">Title</option>
+            <option value="abstract">Abstract</option>
+        </select>
+        <br>
+
+      </div>
+      <br>
+      <button type="button" class="btn btn-default btn-success" onclick="update_filter();">   Go!   </button>
+      <script type="text/javascript">
+        var valueToSelect = "{{fields}}";
+        var element = document.getElementById('fields');
+        element.value = valueToSelect;
+      </script>
+      <br><br>
+      <button type="button" class="btn btn-default" onclick="exportBasic();"> Export Sentences </button>
+    </div>
+    <div class="col-md-4 col-md-offset-1" >
+
+
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Articles Matched</th>
+            <th>Sentences Matched</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{ stats.general_stats.article_count }}</td>
+            <td>{{ stats.general_stats.sentence_count }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <canvas id="myChart" width="400" height="400"></canvas>
+
+      <script type="text/javascript">
+        var the_years = "{{stats.general_stats.article_count_by_year|safe}}";
+        var str = (the_years.replace(/\'/ig,'\"')) ;
+        the_years =JSON.parse(str);
+        var labels = [];
+        var background_color = [];
+        var border_color=[];
+        var counts = [];
+        for(var i=0; i<the_years.length;i++){
+          labels.push(the_years[i]["article__year"]);
+          background_color.push("rgba(26, 134, 4, 0.73)");
+          border_color.push("rgba(26, 134, 4, 0.73)");
+          counts.push(the_years[i]["article__pubmed_id__count"]);
+        }
+
+        var chart_data={"labels":labels,
+          "datasets":[
+            {
+              "label":"Articles By Year",
+              "backgroundColor": background_color,
+              "borderColor": border_color,
+              "borderWidth": 1,
+              "data": counts
+            }
+          ]
+        };
+        //console.lmouseog(chart_data);
+        var bar_percentage = 1.0
+        if(the_years.length<5){
+          bar_percentage = the_years.length/10;
+        }
+        var ctx = $("#myChart");
+
+        var myBarChart = new Chart(ctx, {
+          type: 'bar',
+          data: chart_data,
+          options:{
+            onClick: function(event,x){
+                    //console.log(the_years[x[0]["_index"]]["article__year"]);
+                    var clicked_year = the_years[x[0]["_index"]]["article__year"];
+                    $("#start_year").val(clicked_year);
+                    $("#end_year").val(clicked_year);
+                    update_filter();
+            },
+            animation: {
+                duration: 1,
+                onComplete: function () {
+                    var chartInstance = this.chart,
+                        ctx = chartInstance.ctx;
+                    ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontSize, Chart.defaults.global.defaultFontStyle, Chart.defaults.global.defaultFontFamily);
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'bottom';
+
+                    this.data.datasets.forEach(function (dataset, i) {
+                        var meta = chartInstance.controller.getDatasetMeta(i);
+                        meta.data.forEach(function (bar, index) {
+                            var data = dataset.data[index];
+                            ctx.fillText(data, bar._model.x, bar._model.y - 5);
+                        });
+                    });
+                }
+            },
+            scales:{
+                xAxes:[{
+                  barPercentage: bar_percentage
+                }],
+                yAxes:[{
+                  display:true,
+                  ticks:{
+                    suggestedMin:0
+                  }
+                }]
+            }
+          },
+
+        });
+      </script>
+    </div>
+  </div>
+{% endif %}
+
+<div class="row" style="padding-bottom: 40px;">
+  {% if not "title_count" in stats.general_stats %}
+  <div class="col-md-10 col-md-offset-1 " style="padding-top: 20px;">
+  {% else %}
+    <div class="col-md-10 col-md-offset-1" style="padding-top: 20px;">
+  {%endif%}
+
+      {% if page_number != 0 %}
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                    <th class="text-center">PMID</th>
+                    <th class="text-center">DOI</th>
+                    <th class="text-center">Date</th>
+                    <th class="text-center">Article Title</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for article_sentence_group in paginated_sentences_grouped %}
+                    <tr>
+                        <td class="text-center"> <a href="https://www.ncbi.nlm.nih.gov/pubmed/{{ article_sentence_group.0.article_id }}" target="_blank">{{ article_sentence_group.0.article_id }}</a> </td>
+                        <!-- You will not be able to see this text. <td>{{ article_sentence_group.0.article.pubmed_id }}</td> -->
+                        <td class="text-center">{{ article_sentence_group.0.article.doi }}</td>
+                        <td class="text-center">{{ article_sentence_group.0.article.year }}</td>
+
+                        <td onclick="exploreAbstract(this);"> {{ article_sentence_group.0.sentence| safe }}
+                          <table class="table table-bordered hide-abstract-sentences" style="margin-top:20px;margin-bottom:-3px;">
+                            <tbody>
+                              {% for abstract_sentence in article_sentence_group.1 %}
+                              <tr>
+                                <td>
+                                  {{ abstract_sentence.sentence| safe }}
+                                </td>
+                              </tr>
+                              {% endfor %}
+                            </tbody>
+                          </table>
+                        </td>
+                    </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+      {% endif %}
+
+      {% if page_count > 0 %}
+        <ul class="pagination">
+
+          {% if page_number == 1 %}
+            <li><a href="?fields={{fields}}&sYear={{ sYear }}&eYear={{ eYear }}&query={{query}}">PREV</a></li>
+          {% elif page_number == 0 %}
+            <li class="disabled"><span>PREV</span></li>
+          {% elif paginated_articles.has_previous %}
+            <li><a href="?fields={{fields}}&sYear={{ sYear }}&eYear={{ eYear }}&query={{query}}&page={{ paginated_articles.previous_page_number }}">PREV</a></li>
+          {% else %}
+            <li class="disabled"><span>PREV</span></li>
+          {% endif %}
+
+          {% if page_number == 0 %}
+            <li class="active"><span>Overview<span class="sr-only">(current)</span></span></li>
+          {% else %}
+              <li><a href="?fields={{fields}}&sYear={{ sYear }}&eYear={{ eYear }}&query={{query}}">Overview</a></li>
+          {% endif %}
+
+          {% if paginated_articles.number > 5 %}
+              <li><a href="?fields={{fields}}&sYear={{ sYear }}&eYear={{ eYear }}&query={{query}}&page={{ 1 }}">{{ 1 }}</a></li>
+              {% if paginated_articles.number != 5|add:"1" %}
+                <li><a>...</a> </li>
+              {% endif %}
+          {% endif %}
+
+          {% for i in paginated_articles.paginator.page_range %}
+            {% if paginated_articles.number == i and page_number != 0%}
+              <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+            {% else %}
+                {% if paginated_articles.number > i|add:"-5" and paginated_articles.number < i|add:"+5" %}
+                    <li><a href="?fields={{fields}}&sYear={{ sYear }}&eYear={{ eYear }}&query={{query}}&page={{ i }}">{{ i }}</a></li>
+                {% endif %}
+            {% endif %}
+          {% endfor %}
+
+          {% if paginated_articles.number < paginated_articles.paginator.num_pages|add:"-5"|add:"1" %}
+              {% if paginated_articles.number != paginated_articles.paginator.num_pages|add:"-5" %}
+                <li><a>...</a> </li>
+              {% endif %}
+              <li><a href="?fields={{fields}}&sYear={{ sYear }}&eYear={{ eYear }}&query={{query}}&page={{ paginated_articles.paginator.num_pages }}">{{ paginated_articles.paginator.num_pages }}</a></li>
+          {% endif %}
+
+
+
+          {% if page_number == 0 %}
+            <li><a href="?fields={{fields}}&sYear={{ sYear }}&eYear={{ eYear }}&query={{query}}&page=1">NEXT</a></li>
+          {% elif paginated_articles.has_next %}
+            <li><a href="?fields={{fields}}&sYear={{ sYear }}&eYear={{ eYear }}&query={{query}}&page={{ paginated_articles.next_page_number }}">NEXT</a></li>
+          {% else %}
+            <li class="disabled"><span>NEXT</span></li>
+          {% endif %}
+
+
+        </ul>
+        <div class="form-inline" style="padding-bottom: 100px">
+          <input type="number" pattern="^[1-9]\d*$" min="1"  step="1" id="pagination" class="form-control" placeholder="Enter a page number">
+          <button class="btn btn-default" id="pagination_submit">Go!</button>
+        </div>
+      {% endif %}
+
+
+
+
+    </div>
+  </div>
+{% endblock content %}

@@ -1,0 +1,21 @@
+FROM ubuntu:16.04
+
+RUN apt-get -y update
+RUN apt-get -y install postgresql=9.5+173ubuntu0.1 postgresql-contrib=9.5+173ubuntu0.1
+
+USER postgres
+
+RUN service postgresql start &&\
+    psql --command "CREATE DATABASE neuroboundb" &&\
+    psql --command "CREATE USER neurobounuser WITH PASSWORD 'neuro1234';" &&\
+    psql --command "ALTER ROLE neurobounuser SET client_encoding TO 'utf8';" &&\
+    psql --command "ALTER ROLE neurobounuser SET default_transaction_isolation TO 'read committed';" &&\
+    psql --command "ALTER ROLE neurobounuser SET timezone TO 'UTC';" &&\
+    psql --command "GRANT ALL PRIVILEGES ON DATABASE neuroboundb TO neurobounuser;"
+
+RUN echo "host all  all    0.0.0.0/0  md5" >> /etc/postgresql/9.5/main/pg_hba.conf
+RUN echo "listen_addresses='*'" >> /etc/postgresql/9.5/main/postgresql.conf
+
+
+CMD /usr/lib/postgresql/9.5/bin/postgres -D /var/lib/postgresql/9.5/main -c config_file=/etc/postgresql/9.5/main/postgresql.conf
+
